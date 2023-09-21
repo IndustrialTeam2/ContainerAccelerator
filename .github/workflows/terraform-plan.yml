@@ -1,12 +1,12 @@
-name: "Terraform Plan"
+name: "Terraform CI/CD"
 
 on:
   pull_request:
 
 env:
-  TF_CLOUD_ORGANIZATION: "YOUR-ORGANIZATION-HERE"
+  TF_CLOUD_ORGANIZATION: "Team2-IndustrialProject"
   TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
-  TF_WORKSPACE: "learn-terraform-github-actions"
+  TF_WORKSPACE: "team2-industrial-project"
   CONFIG_DIRECTORY: "./"
 
 jobs:
