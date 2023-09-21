@@ -1,3 +1,4 @@
-# Automate Terraform with GitHub Actions
+# Industrial Project - Team 2
 
-This repo is a companion repo to the [Automate Terraform with GitHub Actions tutorial](https://developer.hashicorp.com/terraform/tutorials/automation/github-actions).
+GitHub actions and workflow setup by following this guide: 
+https://developer.hashicorp.com/terraform/tutorials/automation/github-actions#prerequisites
