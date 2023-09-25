@@ -2,7 +2,7 @@ module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
   name = "eks-vpc"
-  azs  = ["us-east-1a", "us-east-1b"]
+  azs  = var.availability_zones
   cidr = "10.0.0.0/16"
 
   instance_tenancy = "default"
