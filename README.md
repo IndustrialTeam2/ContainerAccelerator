@@ -1,5 +1,14 @@
 # Technical Manual - Industrial Project - Team 2
 
+>## Contents 
+> - [Prerequisites](#prerequisites)
+> - [Pipeline Setup](#pipeline-setup)
+>   - [AWS](#aws)
+>   - [Terraform Cloud](#terraform-cloud)
+>   - [GitHub Repository](#github-repository)
+><br></br>
+
+
 ## Prerequisites
 1. Create an [AWS](https://link-url-here.org) account.
 2. Create a [Terraform Cloud](https://app.terraform.io/session) account.
@@ -37,7 +46,7 @@
 
 
 ---------------------------------------------------------
-
+<br></br>
 ># Sources
 > - GitHub actions with Terraform Cloud for AWS: 
 https://developer.hashicorp.com/terraform/tutorials/automation/github-actions#prerequisites
