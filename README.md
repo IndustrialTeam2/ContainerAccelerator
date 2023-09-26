@@ -36,3 +36,8 @@
    - The value will be the key that has been created earlier in the Terraform Cloud.
 
 
+---------------------------------------------------------
+
+># Sources
+> - GitHub actions with Terraform Cloud for AWS: 
+https://developer.hashicorp.com/terraform/tutorials/automation/github-actions#prerequisites
