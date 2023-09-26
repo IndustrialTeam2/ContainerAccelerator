@@ -1,8 +1,8 @@
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   version         = "19.16.0"
-  cluster_name    = "eks-cluster"
   cluster_version = "1.27"
+  cluster_name    = var.cluster_name
   
 
   vpc_id = module.vpc.vpc_id
@@ -27,23 +27,17 @@ cluster_additional_security_group_ids = [aws_security_group.worker_group_mgmt_on
     }
   }
 
-
   eks_managed_node_groups = {
     default_node_group = {
-      min_size = 1
-      desired_size = 2
-      max_size = 3
+      min_size = var.node_group_minimum_instances
+      desired_size = var.node_group_desired_instances
+      max_size = var.node_group_maximum_instances
 
-      instance_types = ["t2.small"]
+      instance_types = var.node_group_instance_types
       cluster_additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
       capacity_type = "SPOT"
-
     }
-    
   }
 
   enable_irsa = true
-
-  
 }
-
