@@ -8,13 +8,28 @@
 
 ## Pipeline Setup
 ### AWS
-#### AWS CI/CD Pipeline User
+#### AWS CI/CD Pipeline User / EKS Cluster Creator
 1. Create a new user and attach the following policies:
    - policy1
    - policy2
 2. Give this user console-access.
 3. Create an access key tied to this user.
    - Make sure to download the csv file provided as that contains the ID and key pair for the access key that has been created.
+
+### Terraform Cloud
+1. Once an organization has been created add a new workspace to the organization.
+2. In the workspace go to Variables > Workspace Variables and:
+    - For both variables select the environment category.
+    - Create a new variable and name it ``AWS_ACCESS_KEY_ID`` for the value enter the key ID from the csv file provided.
+    - Create a new variable and name it ``AWS_SECRET_ACCESS_KEY`` for the value enter the secret access key from the csv file provided.
+      - Set this variable to sensitive. 
+3. Create an API Token.
+    - Enter the user settings menu and go to the "Tokens" section.
+    - Press the "Create an API Token" button.
+      -  Give it a meaningful description.
+      -  Set an expiry date for as long as required.
+
+
 
 
 
