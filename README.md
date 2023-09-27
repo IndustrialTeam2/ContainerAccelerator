@@ -6,6 +6,7 @@
 >   - [AWS](#aws)
 >   - [Terraform Cloud](#terraform-cloud)
 >   - [GitHub Repository](#github-repository)
+> - [Sources](#sources)
 ><br></br>
 
 
@@ -67,7 +68,18 @@ Make sure to download the csv file provided as that contains the ID and key pair
 
 
 -----------------------------------------------------------------------------
-<br></br>
-># Sources
-> - GitHub actions with Terraform Cloud for AWS: 
-https://developer.hashicorp.com/terraform/tutorials/automation/github-actions#prerequisites
+
+## Sources
+
+> > ### GitHub actions with Terraform Cloud for AWS: 
+> >https://developer.hashicorp.com/terraform/tutorials/automation/github-actions#prerequisites
+> >
+> >Date Accessed - [27/09/2023]
+> 
+> > #### GitHub actions workflow file source
+> > This is where the `.github` folder in this repository is from.
+> > https://github.com/hashicorp-education/learn-terraform-github-actions
+> >
+> > Date Accessed - [27/09/2023]
+> 
+> <br></br>
