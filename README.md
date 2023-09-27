@@ -29,9 +29,12 @@
 
 5. Create an access key tied to this user. 
 > ![Alt text](./res/images/access_keys.png)
+
 Select the `Command Line Interface (CLI)` option.
+
 > ![Alt text](./res/images/cli_option.png)
-> Give it a meaningful description tag value.
+
+Give it a meaningful description tag value.
  
 Make sure to download the csv file provided as that contains the ID and key pair for the access key that has been created, this will be needed in the next section.
 
