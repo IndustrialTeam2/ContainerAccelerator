@@ -38,7 +38,7 @@ Give it a meaningful description tag value.
  
 Make sure to download the csv file provided as that contains the ID and key pair for the access key that has been created, this will be needed in the next section.
 
-> ![Alt text](./res/images/access_keys_csv.png)
+> ![Showing where to download the newly created access keys CSV file.](./res/images/access_keys_csv.png)
 > <br></br>
 -----------------------------------------------------------------------------
 ### Terraform Cloud
