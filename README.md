@@ -61,7 +61,7 @@ Make sure to download the csv file provided as that contains the ID and key pair
     -  Once it is created make sure the key provided has been copied and stored somewhere temporarily as it will be used in the next section and properly discarded after it has been added to the GitHub Repository as a secret.
 -----------------------------------------------------------------------------
 ### GitHub Repository 
-1. Within the GitHub repository go to `Settings > Secrets and variables > Secrets > Actions` and create a new secret variable, this variable will be the API token created in the Terraform Cloud.
+1. Within the GitHub repository go to `Settings > Secrets and variables > Actions` and create a new secret variable, this variable will be the API token created in the Terraform Cloud.
    - Give it the name `TF_API_TOKEN`.
    - The value will be the key that has been created earlier in the Terraform Cloud.
 
