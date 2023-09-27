@@ -25,21 +25,21 @@
    - policy2
 4. Select the `Security credentials` tab and give this user console-access.
    - This part will be used later when deploying kubernetes as this allows to view the nodes on the cluster.
-> ![Security credenitals image](./res/images/security_credentials.png)
+> ![Security credenitals image.](./res/images/security_credentials.png)
 
 5. Create an access key tied to this user. 
-> ![Alt text](./res/images/access_keys.png)
+> ![Showing how to create access key.](./res/images/access_keys.png)
 
 Select the `Command Line Interface (CLI)` option.
 
-> ![Alt text](./res/images/cli_option.png)
+> ![Showing to select the CLI option.](./res/images/cli_option.png)
 
 Give it a meaningful description tag value.
  
 Make sure to download the csv file provided as that contains the ID and key pair for the access key that has been created, this will be needed in the next section.
 
 > ![Alt text](./res/images/access_keys_csv.png)
-<br></br>
+> <br></br>
 -----------------------------------------------------------------------------
 ### Terraform Cloud
 1. Once an organization has been created add a new workspace to the organization.
@@ -49,14 +49,19 @@ Make sure to download the csv file provided as that contains the ID and key pair
     - Create a new variable and name it ``AWS_SECRET_ACCESS_KEY`` for the value enter the secret access key from the csv file provided.
       - Set this variable to sensitive. 
 3. Create an API Token.
-    - Enter the user settings menu and go to the "Tokens" section.
-    - Press the "Create an API Token" button.
-      -  Give it a meaningful description.
-      -  Set an expiry date for as long as required.
-      -  Once it is created make sure the key provided has been copied and stored somewhere temporarily as it will be used in the next section and properly discarded after it has been added to the GitHub Repository as a secret.
+   
+   Enter the user settings menu and go to the "Tokens" section.
+   > ![Showing how to access 'User Settings'](./res/images/tfc_user_settings.png)
+   >
+   > ![Showing how to get to the Tokens section](./res/images/tokens_section.png)
+
+   Press the "Create an API Token" button.
+    -  Give it a meaningful description.
+    -  Set an expiry date for as long as required.
+    -  Once it is created make sure the key provided has been copied and stored somewhere temporarily as it will be used in the next section and properly discarded after it has been added to the GitHub Repository as a secret.
 -----------------------------------------------------------------------------
 ### GitHub Repository 
-1. Within the GitHub repository go to `Settings > Secrets and variables > Secrets` and create a new secret variable, this variable will be the API token created in the Terraform Cloud.
+1. Within the GitHub repository go to `Settings > Secrets and variables > Secrets > Actions` and create a new secret variable, this variable will be the API token created in the Terraform Cloud.
    - Give it the name `TF_API_TOKEN`.
    - The value will be the key that has been created earlier in the Terraform Cloud.
 
