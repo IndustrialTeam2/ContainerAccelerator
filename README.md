@@ -21,11 +21,16 @@
 ### AWS
 1. Goto the IAM console and select the `Users` section.
 2. Create a new user and give it a meaningful name.
-3. Afterwards, click on the new user's name and in the `Permissions` tab attach the following policies:
-   - policy1
-   - policy2
+3. Afterwards, click on the new user's name and in the `Permissions` tab, select `Add permissions`:
+
+Under the `permission options` section select `Attach policies directly`
+
+>![Alt text](./res/images/perm_options.png)
+
+Then select `AdministratorAccess`, `IAMFullAccess` and `PowerUserAccess`, and press `Add Permissions` to confirm.
+
 4. Select the `Security credentials` tab and give this user console-access.
-   - This part will be used later when deploying kubernetes as this allows to view the nodes on the cluster.
+
 > ![Security credenitals image.](./res/images/security_credentials.png)
 
 5. Create an access key tied to this user. 
