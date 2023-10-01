@@ -138,7 +138,6 @@ jobs:
           filePath: comment.md/comment.md
           # message: "Hello world! :wave:"
 
-# This part also needs to download the state and the plan. Currently the plan download doesn't work, use the same plugin as the state download (in other file)
   tf_apply:
     name: Apply Terraform Plan on PR Merge
     runs-on: ubuntu-latest
@@ -148,11 +147,11 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Configure AWS CLI
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: us-east-1
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              aws-region: us-east-1
 
       - name: Terraform Initialise
         run: terraform init
