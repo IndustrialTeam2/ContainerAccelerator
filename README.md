@@ -22,7 +22,7 @@
 2. Create a new user and give it a meaningful name.
 3. Afterwards, click on the new user's name and in the `Permissions` tab, select `Add permissions`:
 
-Under the `permission options` section select `Attach policies directly`
+Under the `permission options` section select `Attach policies directly`.
 
 >![Alt text](./res/images/perm_options.png)
 
