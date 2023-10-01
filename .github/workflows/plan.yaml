@@ -120,7 +120,7 @@ jobs:
   comment_pr:
     runs-on: ubuntu-latest
     needs: tf_plan
-    name: Comment a PR
+    name: Comment on PR
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     steps:
       - name: Checkout
@@ -136,6 +136,7 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           filePath: comment.md/comment.md
+          message: "Hello world! :wave:"
 
 # This part also needs to download the state and the plan. Currently the plan download doesn't work, use the same plugin as the state download (in other file)
   tf_apply:
