@@ -42,36 +42,26 @@ Select the `Command Line Interface (CLI)` option.
 
 Give it a meaningful description tag value.
  
-Make sure to download the csv file provided as that contains the ID and key pair for the access key that has been created, this will be needed in the next section.
+Make sure to download the csv file provided as that contains the ID and key pair for the access key that has been created, these will be needed for our GitHub repository secrets.
 
 > ![Showing where to download the newly created access keys CSV file.](./res/images/access_keys_csv.png)
 > <br></br>
 -----------------------------------------------------------------------------
-### Terraform Cloud
-1. Once an organization has been created add a new workspace to the organization.
-2. In the workspace go to `Variables > Workspace Variables` and:
-    - For both variables select the environment category.
-    - Create a new variable and name it ``AWS_ACCESS_KEY_ID`` for the value enter the key ID from the csv file provided.
-    - Create a new variable and name it ``AWS_SECRET_ACCESS_KEY`` for the value enter the secret access key from the csv file provided.
-      - Set this variable to sensitive. 
-3. Create an API Token.
-   
-   Enter the user settings menu and go to the "Tokens" section.
-   > ![Showing how to access 'User Settings'](./res/images/tfc_user_settings.png)
-   >
-   > ![Showing how to get to the Tokens section](./res/images/tokens_section.png)
+### Encryption Key
+This is fairly simple you may either some random text or what you could do is hash a string with a hashing algorithm like `sha256` or `sha512`. This will be stored as GitHub repository secret.
 
-   Press the "Create an API Token" button.
-    -  Give it a meaningful description.
-    -  Set an expiry date for as long as required.
-    -  Once it is created make sure the key provided has been copied and stored somewhere temporarily as it will be used in the next section and properly discarded after it has been added to the GitHub Repository as a secret.
+You may use this [sha512 generator website](https://sha512.online/), or some in-house tool to create your own key.
+
+
 -----------------------------------------------------------------------------
 ### GitHub Repository 
-1. Within the GitHub repository go to `Settings > Secrets and variables > Actions` and create a new secret variable, this variable will be the API token created in the Terraform Cloud.
-   - Give it the name `TF_API_TOKEN`.
-   - The value will be the key that has been created earlier in the Terraform Cloud.
+Within the GitHub repository go to `Settings > Secrets and variables > Actions` and create a few secret variables.
 
-
+| Variable Name | Value |
+| -------- | ------- |
+| `AWS_ACCESS_KEY_ID` | Access key ID from the downloaded `csv` file. |
+| `AWS_SECRET_ACCESS_KEY` | Secret access key from the downloaded `csv` file. |
+| `ENCRYPTION_KEY` | The key generated or made from the [previous step](#encryption-key). |
 -----------------------------------------------------------------------------
 
 ## Sources
