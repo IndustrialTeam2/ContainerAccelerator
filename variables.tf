@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 variable "cluster_name" {
   type = string
   description = "Name of the cluster"
@@ -59,4 +57,3 @@ variable "node_group_maximum_instances" {
   description = "Maximum number of instances in the default node group"
   default = 3
 }
->>>>>>> Stashed changes

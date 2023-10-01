@@ -30,13 +30,6 @@ cluster_additional_security_group_ids = [aws_security_group.worker_group_mgmt_on
 
   eks_managed_node_groups = {
     default_node_group = {
-<<<<<<< Updated upstream
-      min_size = 1
-      desired_size = 2
-      max_size = 3
-
-      instance_types = ["t2.small"]
-=======
       # Define the node group for the worker nodes
       # Set the desired, minimum and maximum count of nodes
       min_size = var.node_group_minimum_instances
@@ -47,7 +40,6 @@ cluster_additional_security_group_ids = [aws_security_group.worker_group_mgmt_on
       instance_types = var.node_group_instance_types
 
       # Set the security groups for the worker nodes
->>>>>>> Stashed changes
       cluster_additional_security_group_ids = [aws_security_group.worker_group_mgmt_one.id]
       capacity_type = "SPOT"
 
