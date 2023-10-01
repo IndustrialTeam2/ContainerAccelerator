@@ -1,0 +1,153 @@
+# Use this file as the baseline, and copy some parts of the daniel-workflow.yml file
+
+name: Terraform Plan and Apply
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+
+jobs:
+
+  tf_fmt:
+    name: Deploy Site
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+
+# Copy this block over
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+            terraform_version: latest
+    - name: Configure AWS CLI
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: us-east-1
+
+    - name: Terraform Init
+      id: init
+      run: terraform init
+
+    - name: Terraform validate
+      id: validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -out=tfplan -no-color -input=false
+      continue-on-error: true
+    
+    - name: Terraform artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: terraform-plan
+        path: tfplan
+    
+    # Copy this over, but put it before terraform plan, so it uses the downloaded state
+    - name: Download artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        name: terraform-state
+        search_artifacts: true
+      continue-on-error: true
+
+    # Copy this over, but put it before terraform plan and after download artifact, so it uses the downloaded state
+    - name: Decrypt file
+      run:
+         openssl aes-256-cbc -d -in terraform.tfstate.enc -out terraform.tfstate -k ${{ secrets.ENCRYPTION_KEY }}
+      continue-on-error: true
+
+  tf_plan:
+
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform with specified version
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Terraform Plan
+        run: |
+          terraform plan -out=tfplan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Generate Terraform Plan Comment
+        run: |
+            COMMENT="### Terraform Plan\n\`\`\`hcl\n$(terraform show tfplan)\n\`\`\`"
+            echo "$COMMENT" > comment.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Terraform artifact comment
+        uses: actions/upload-artifact@v2
+        with:
+          name: terraform-plan-comment
+          path: comment.md
+
+      - name: Terraform artifact plan file
+        uses: actions/upload-artifact@v2
+        with:
+          name: terraform-plan-file
+          path: tfplan
+
+  example_comment_pr:
+    runs-on: ubuntu-latest
+    needs: tf_plan
+    name: An example job to comment a PR
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download Terraform Plan comment
+        uses: actions/download-artifact@v2
+        with:
+          name: terraform-plan-comment
+          path: comment.md
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          filePath: comment.md/comment.md
+
+# This part also needs to download the state and the plan. Currently the plan download doesn't work, use the same plugin as the state download (in other file)
+  tf_apply:
+    name: Apply Terraform Plan on PR Merge
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    steps:
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve 
+        env:
+          AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Encrypt file
+        run:
+            openssl aes-256-cbc -e -in terraform.tfstate -out terraform.tfstate.enc -k ${{ secrets.ENCRYPTION_KEY }}
+      
+      - name: Terraform artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: terraform-state
+          path: ./terraform.tfstate.enc
