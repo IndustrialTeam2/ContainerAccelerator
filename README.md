@@ -4,7 +4,7 @@
 > - [Prerequisites](#prerequisites)
 > - [Pipeline Setup](#pipeline-setup)
 >   - [AWS](#aws)
->   - [Terraform Cloud](#terraform-cloud)
+>   - [Encryption Key](#encryption-key)
 >   - [GitHub Repository](#github-repository)
 > - [Sources](#sources)
 ><br></br>
