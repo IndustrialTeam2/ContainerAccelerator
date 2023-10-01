@@ -66,15 +66,36 @@ Within the GitHub repository go to `Settings > Secrets and variables > Actions` 
 
 ## Sources
 
-> > ### GitHub actions with Terraform Cloud for AWS: 
-> >https://developer.hashicorp.com/terraform/tutorials/automation/github-actions#prerequisites
+> ### GitHub Actions Workflow
+> > #### Checkout: 
+> > https://github.com/actions/checkout/tree/v3/
+> > https://github.com/actions/checkout/tree/v2/
 > >
-> >Date Accessed - [27/09/2023]
-> 
-> > #### GitHub actions workflow file source
-> > This is where the `.github` folder in this repository is from.
-> > https://github.com/hashicorp-education/learn-terraform-github-actions
+> > Date Accessed - [01/10/2023]
+>
+> > #### Setup Terraform:
+> > https://github.com/hashicorp/setup-terraform/tree/v1/
 > >
-> > Date Accessed - [27/09/2023]
-> 
+> > Date Accessed - [01/10/2023]
+>
+> > #### Configure AWS CLI:
+> > https://github.com/aws-actions/configure-aws-credentials/tree/v1/
+> >
+> > Date Accessed - [01/10/2023]
+>
+> > #### Upload GitHub Artifact:
+> > https://github.com/actions/upload-artifact/tree/v2/
+> >
+> > Date Accessed - [01/10/2023]
+>
+> > #### Download GitHub Artifact:
+> > https://github.com/dawidd6/action-download-artifact/tree/v2/
+> >
+> > Date Accessed - [01/10/2023]
+>
+> > #### Comment on Pull Request:
+> > https://github.com/thollander/actions-comment-pull-request/tree/v2/
+> >
+> > Date Accessed - [01/10/2023]
+>
 > <br></br>
