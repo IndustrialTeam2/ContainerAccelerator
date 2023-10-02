@@ -46,7 +46,7 @@ jobs:
       continue-on-error: true
     
     - name: Terraform artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: terraform-plan
         path: tfplan
@@ -106,13 +106,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Terraform artifact comment
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: terraform-plan-comment
           path: comment.md
 
       - name: Terraform artifact plan file
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: terraform-plan-file
           path: tfplan
@@ -174,7 +174,7 @@ jobs:
             openssl aes-256-cbc -e -in terraform.tfstate -out terraform.tfstate.enc -k ${{ secrets.ENCRYPTION_KEY }}
       
       - name: Terraform artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: terraform-state
           path: ./terraform.tfstate.enc
