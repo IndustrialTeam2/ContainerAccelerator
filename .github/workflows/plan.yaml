@@ -12,7 +12,7 @@ on:
 
 jobs:
 
-  tf_fmt:
+  deploy_site:
     name: Deploy Site
     runs-on: ubuntu-latest
     steps:
@@ -51,31 +51,9 @@ jobs:
         name: terraform-plan
         path: tfplan
         
-  dnld_file:
-    name: Donwload artifact
-    runs-on: ubuntu-latest
-    steps:
-    # Copy this over, but put it before terraform plan, so it uses the downloaded state
-    - name: Download artifact
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        name: terraform-state
-        search_artifacts: true
-      continue-on-error: true
-
-  decrypt_file:
-    name: Decrypt file
-    runs-on: ubuntu-latest
-    steps:
-    # Copy this over, but put it before terraform plan and after download artifact, so it uses the downloaded state
-    - name: Decrypt file
-      run:
-         openssl aes-256-cbc -d -in terraform.tfstate.enc -out terraform.tfstate -k ${{ secrets.ENCRYPTION_KEY }}
-      continue-on-error: true
-
   tf_plan:
-
     name: Terraform Plan
+    needs: deploy_site
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     steps:
@@ -153,18 +131,34 @@ jobs:
               aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
               aws-region: us-east-1
 
+      - name: Download artifact - state
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: terraform-state
+          search_artifacts: true
+        continue-on-error: true
+
+      - name: Download artifact - plan
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: tfplan
+          search_artifacts: true
+        continue-on-error: true
+      
+      - name: Decrypt state file
+        run:
+          openssl aes-256-cbc -d -in terraform.tfstate.enc -out terraform.tfstate -k ${{ secrets.ENCRYPTION_KEY }}
+        continue-on-error: true
+
       - name: Terraform Initialise
         run: terraform init
       
-      - name: Terraform Format 
-        run: terraform fmt
-
-      - name: Terraform Plan
-        run: terraform plan
+      - name: Compare Terraform State
+        run: terraform import terraform-state/terraform/state
 
       - name: Terraform Apply
         id: apply
-        run: terraform apply -auto-approve 
+        run: terraform apply -auto-approve tfplan/tfplan
         env:
           AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
