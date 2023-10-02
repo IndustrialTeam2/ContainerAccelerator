@@ -22,7 +22,7 @@ jobs:
 
 # Copy this block over
     - name: Install Terraform
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v2
       with:
             terraform_version: latest
     - name: Configure AWS CLI
