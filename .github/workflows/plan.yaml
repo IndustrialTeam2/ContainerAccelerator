@@ -19,8 +19,7 @@ jobs:
 
     - name: Checkout Repo
       uses: actions/checkout@v3
-
-# Copy this block over
+      
     - name: Install Terraform
       uses: hashicorp/setup-terraform@v1
       with:
