@@ -144,7 +144,7 @@ jobs:
           name: tfplan
           search_artifacts: true
         continue-on-error: true
-      
+
       - name: Decrypt state file
         run:
           openssl aes-256-cbc -d -in terraform.tfstate.enc -out terraform.tfstate -k ${{ secrets.ENCRYPTION_KEY }}
@@ -153,8 +153,10 @@ jobs:
       - name: Terraform Initialise
         run: terraform init
       
-      - name: Compare Terraform State
-        run: terraform import terraform-state/terraform/state
+      - name: Import Terraform State
+        run:
+          terraform import terraform-state/terraform/state
+        continue-on-error: true
 
       - name: Terraform Apply
         id: apply
@@ -172,3 +174,29 @@ jobs:
         with:
           name: terraform-state
           path: ./terraform.tfstate.enc
+      
+  infra_test: 
+    name: Infrastructure Test
+    needs: tf_apply
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Configure AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              aws-region: us-east-1
+
+      - name: Setup kubeconfig
+        run: |
+          aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terraform output -raw cluster_name)
+        continue-on-error: false
+
+      - name: Run cluster test
+        run: python ./test_cluster.py
+        continue-on-error: false
+
