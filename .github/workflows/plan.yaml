@@ -78,7 +78,7 @@ jobs:
 
       - name: Generate Terraform Plan Comment
         run: |
-            COMMENT="### Terraform Plan\n\`\`\`hcl\n$(terraform show tfplan)\n\`\`\`"
+            COMMENT="### Terraform Plan\n\`\`\`hcl\n$(terraform show -nocolor tfplan)\`\`\`"
             echo "$COMMENT" > comment.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
