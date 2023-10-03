@@ -28,19 +28,19 @@ jobs:
               aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
               aws-region: us-east-1
       
-      - name: Download artifact - state
-        id: dnld_state
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          name: terraform-state
-          search_artifacts: true
-        continue-on-error: true
+      #- name: Download artifact - state
+        #id: dnld_state
+        #uses: dawidd6/action-download-artifact@v2
+        #with:
+          #name: terraform-state
+          #search_artifacts: true
+        #continue-on-error: true
 
-      - name: Decrypt state file
-        if: steps.dnld_state.outcome == 'success' 
-        run:
-          openssl aes-256-cbc -d -in terraform.tfstate.enc -out terraform.tfstate -k ${{ secrets.ENCRYPTION_KEY }}
-        continue-on-error: true
+      #- name: Decrypt state file
+        #if: steps.dnld_state.outcome == 'success' 
+        #run:
+          #openssl aes-256-cbc -d -in terraform.tfstate.enc -out terraform.tfstate -k ${{ secrets.ENCRYPTION_KEY }}
+        #continue-on-error: true
 
       - name: Terraform Init
         run: terraform init
@@ -78,8 +78,8 @@ jobs:
 
       - name: Generate Terraform Plan Comment
         run: |
-            COMMENT="### Terraform Plan\n\`\`\`hcl\n$(terraform show tfplan)\n\`\`\`"
-            echo "$COMMENT" > comment.md
+            COMMENT="### Terraform Plan\n\`\`\`hcl\n$(terraform show -no-color tfplan)\n\`\`\`"
+            echo -e "$COMMENT" > comment.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
