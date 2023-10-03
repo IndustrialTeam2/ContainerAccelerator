@@ -6,6 +6,7 @@
 >   - [AWS](#aws)
 >   - [Encryption Key](#encryption-key)
 >   - [GitHub Repository](#github-repository)
+> - [Pipeline Usage](#pipeline-usage)
 > - [Sources](#sources)
 ><br></br>
 
