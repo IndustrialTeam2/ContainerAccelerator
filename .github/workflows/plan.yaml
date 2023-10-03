@@ -11,70 +11,8 @@ on:
       - closed
 
 jobs:
-
-  tf_fmt:
-    name: Deploy Site
-    runs-on: ubuntu-latest
-    steps:
-
-    - name: Checkout Repo
-      uses: actions/checkout@v3
-
-# Copy this block over
-    - name: Install Terraform
-      uses: hashicorp/setup-terraform@v1
-      with:
-            terraform_version: latest
-    - name: Configure AWS CLI
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: us-east-1
-
-    - name: Terraform Init
-      id: init
-      run: terraform init
-
-    - name: Terraform validate
-      id: validate
-      run: terraform validate
-
-    - name: Terraform Plan
-      id: plan
-      run: terraform plan -out=tfplan -no-color -input=false
-      continue-on-error: true
-    
-    - name: Terraform artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: terraform-plan
-        path: tfplan
-        
-  dnld_file:
-    name: Donwload artifact
-    runs-on: ubuntu-latest
-    steps:
-    # Copy this over, but put it before terraform plan, so it uses the downloaded state
-    - name: Download artifact
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        name: terraform-state
-        search_artifacts: true
-      continue-on-error: true
-
-  decrypt_file:
-    name: Decrypt file
-    runs-on: ubuntu-latest
-    steps:
-    # Copy this over, but put it before terraform plan and after download artifact, so it uses the downloaded state
-    - name: Decrypt file
-      run:
-         openssl aes-256-cbc -d -in terraform.tfstate.enc -out terraform.tfstate -k ${{ secrets.ENCRYPTION_KEY }}
-      continue-on-error: true
-
+       
   tf_plan:
-
     name: Terraform Plan
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
@@ -85,11 +23,53 @@ jobs:
       - name: Setup Terraform with specified version
         uses: hashicorp/setup-terraform@v2
 
+      - name: Configure AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              aws-region: us-east-1
+      
+      - name: Download artifact - state
+        id: dnld_state
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: terraform-state
+          search_artifacts: true
+        continue-on-error: true
+
+      - name: Decrypt state file
+        if: steps.dnld_state.outcome == 'success' 
+        run:
+          openssl aes-256-cbc -d -in terraform.tfstate.enc -out terraform.tfstate -k ${{ secrets.ENCRYPTION_KEY }}
+        continue-on-error: true
+
       - name: Terraform Init
         run: terraform init
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      # Set up and initialize Pluralith
+      - name: Pluralith Init
+        uses: Pluralith/actions/init@v1.4.0
+        with:
+          terraform-path: "${{ env.working-directory }}"
+          api-key: ${{ secrets.PLURALITH_API_KEY }}
+
+    # Run Pluralith to generate an infrastructure diagram and comment body
+      - name: Pluralith Run
+        uses: Pluralith/actions/run@v1.4.0
+        with:
+          terraform-command: "plan"
+          terraform-path: "${{ env.working-directory }}"
+          show-changes: true
+          show-drift: true
+
+      - name: Import Terraform state
+        #if: steps.dnld_state.outcome == 'success'
+        run: terraform import terraform-state/terraform-state
+        continue-on-error: true
 
       - name: Terraform Plan
         run: |
@@ -130,12 +110,12 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: terraform-plan-comment
-          path: comment.md
+          path: .
 
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v2
         with:
-          filePath: comment.md/comment.md
+          filePath: ./comment.md
           # message: "Hello world! :wave:"
 
   tf_apply:
@@ -153,18 +133,37 @@ jobs:
               aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
               aws-region: us-east-1
 
+      - name: Download artifact - state
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: terraform-state
+          search_artifacts: true
+        continue-on-error: true
+
+      - name: Download artifact - plan
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: terraform-plan-file
+          path: .
+          search_artifacts: true
+        continue-on-error: true
+
+      - name: Decrypt state file
+        run:
+          openssl aes-256-cbc -d -in terraform.tfstate.enc -out terraform.tfstate -k ${{ secrets.ENCRYPTION_KEY }}
+        continue-on-error: true
+
       - name: Terraform Initialise
         run: terraform init
       
-      - name: Terraform Format 
-        run: terraform fmt
-
-      - name: Terraform Plan
-        run: terraform plan
+      - name: Import Terraform State
+        run:
+          terraform import terraform-state/terraform/state
+        continue-on-error: true
 
       - name: Terraform Apply
         id: apply
-        run: terraform apply -auto-approve 
+        run: terraform apply -auto-approve ./tfplan
         env:
           AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -172,9 +171,40 @@ jobs:
       - name: Encrypt file
         run:
             openssl aes-256-cbc -e -in terraform.tfstate -out terraform.tfstate.enc -k ${{ secrets.ENCRYPTION_KEY }}
-      
-      - name: Terraform artifact
+      #
+      - name: Upload Terraform state artifact
         uses: actions/upload-artifact@v2
         with:
           name: terraform-state
           path: ./terraform.tfstate.enc
+      
+  infra_test: 
+    name: Infrastructure Test
+    needs: tf_apply
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Configure AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              aws-region: us-east-1
+
+      # - name: Setup kubeconfig
+      #   run: |
+      #     aws eks --region $(terraform output -raw region) update-kubeconfig --name $(terraform output -raw cluster_name)
+      #   continue-on-error: false
+
+      - name: Install dependencies
+        uses: actions/setup-python@v3
+      - run: pip install -r py-requirements.txt
+
+      - name: Run cluster test
+        uses: actions/setup-python@v3
+      - run: python test_cluster_configuration.py
+        continue-on-error: false
+
