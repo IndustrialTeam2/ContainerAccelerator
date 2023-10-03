@@ -140,8 +140,6 @@ def scrape_vars(vars_filename: str) -> dict:
         if vars_filename.endswith('.tf'):
             var_dicts = hcl2.load(vars_file)
 
-            print(var_dicts)
-
             if var_dicts and var_dicts != {}:
                 var_dicts = var_dicts['variable']
 
@@ -217,7 +215,7 @@ if __name__ == '__main__':
 
     nodegroup_names_aws = get_cluster_nodegroup_names_aws(b3client, cluster_name_tf)
 
-    nodegroups_aws = {name: get_cluster_nodegroup_aws(b3client, cluster_name_tf, name) for name in nodegroup_names_aws}
+    nodegroups_aws = [get_cluster_nodegroup_aws(b3client, cluster_name_tf, name) for name in nodegroup_names_aws]
 
     nodegroup_instance_types_aws = {nodegroup['nodegroupName']: nodegroup['instanceTypes'] for nodegroup in nodegroups_aws}
 
@@ -233,5 +231,9 @@ if __name__ == '__main__':
 
     test_node_maximum_instances(nodegroup_maximum_instances_tf, nodegroup_scaling_config_aws[nodegroup_names_aws[0]]['maxSize'])
 
+    # show test results
+
+    show_test_results()
+    
     # close client after use [REQUIRED]
     client.close()
