@@ -63,6 +63,13 @@ Within the GitHub repository go to `Settings > Secrets and variables > Actions` 
 | `ENCRYPTION_KEY` | The key generated or made from the [previous step](#encryption-key). |
 -----------------------------------------------------------------------------
 
+## Pipeline Usage
+The CI/CD pipeline only works upon opening a pull request and merging branches, to do so:
+1. Create a new branch or go to pre-existing branch that is not `main`/`master`.
+2. Push one or more commits to that branch afterwards create a new pull request.
+   - Upon creation the pipeline automatically starts running and runs the necessary tasks to validate and plan the underlying terraform code.
+3. Once branch merging starts the next steps of the pipeline trigger where the terraform infrastructure code is deployed to AWS and a script also runs afterwards to test the deployment.
+
 ## Sources
 
  ### <u>GitHub Actions Workflow</u>
