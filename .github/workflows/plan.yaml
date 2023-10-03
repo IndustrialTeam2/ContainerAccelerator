@@ -131,12 +131,12 @@ jobs:
               aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
               aws-region: us-east-1
 
-      - name: Download artifact - state
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          name: terraform-state
-          search_artifacts: true
-        continue-on-error: true
+      #- name: Download artifact - state
+        #uses: dawidd6/action-download-artifact@v2
+        #with:
+          #name: terraform-state
+          #search_artifacts: true
+        #continue-on-error: true
 
       - name: Download artifact - plan
         uses: dawidd6/action-download-artifact@v2
@@ -146,10 +146,10 @@ jobs:
           search_artifacts: true
         continue-on-error: true
 
-      - name: Decrypt state file
-        run:
-          openssl aes-256-cbc -d -in terraform.tfstate.enc -out terraform.tfstate -k ${{ secrets.ENCRYPTION_KEY }}
-        continue-on-error: true
+      #- name: Decrypt state file
+        #run:
+          #openssl aes-256-cbc -d -in terraform.tfstate.enc -out terraform.tfstate -k ${{ secrets.ENCRYPTION_KEY }}
+        #continue-on-error: true
 
       - name: Terraform Initialise
         run: terraform init
