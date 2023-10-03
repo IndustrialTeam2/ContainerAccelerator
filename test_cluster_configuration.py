@@ -236,4 +236,4 @@ if __name__ == '__main__':
     show_test_results()
     
     # close client after use [REQUIRED]
-    client.close()
+    b3client.close()
