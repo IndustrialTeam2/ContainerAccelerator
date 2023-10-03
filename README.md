@@ -73,7 +73,7 @@ The CI/CD pipeline only works upon opening a pull request and merging branches, 
 
 -----------------------------------------------------------------------------
 ## Infrastructure Parameters
-In order to change the parameters of the underlying infrastructure please go into the '[variables.tf](https://github.com/IndustrialTeam2/ContainerAccelerator/blob/main/variables.tf)'.
+In order to change the parameters of the underlying infrastructure please go into the '[variables.tf](https://github.com/IndustrialTeam2/ContainerAccelerator/blob/main/variables.tf)' file and edit there.
 
 - `cluster_name` - Name of the cluster
 - `region` - AWS region where the cluster will be located
