@@ -69,12 +69,6 @@ jobs:
           show-changes: true
           show-drift: true
 
-    # Post the generated diagram as a GitHub comment
-      - name: Add diagram as comment
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          filePath: comment.md
-
       - name: Import Terraform state
         #if: steps.dnld_state.outcome == 'success'
         run: terraform import terraform-state/terraform-state
@@ -93,6 +87,12 @@ jobs:
             echo -e "$COMMENT" > comment.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Post the generated diagram as a GitHub comment
+      - name: Add diagram as comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          filePath: comment.md
 
       - name: Terraform artifact comment
         uses: actions/upload-artifact@v2
