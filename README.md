@@ -63,6 +63,7 @@ Within the GitHub repository go to `Settings > Secrets and variables > Actions` 
 | `AWS_ACCESS_KEY_ID` | Access key ID from the downloaded `csv` file. |
 | `AWS_SECRET_ACCESS_KEY` | Secret access key from the downloaded `csv` file. |
 | `ENCRYPTION_KEY` | The key generated or made from the [previous step](#encryption-key). |
+| `PLURALITH_API_KEY` | API key from pluralith. |
 -----------------------------------------------------------------------------
 
 ## Pipeline Usage
