@@ -7,6 +7,7 @@
 >   - [Encryption Key](#encryption-key)
 >   - [GitHub Repository](#github-repository)
 > - [Pipeline Usage](#pipeline-usage)
+> - [Infrastructure Parameters](#infrastructure-parameters)
 > - [Sources](#sources)
 ><br></br>
 
