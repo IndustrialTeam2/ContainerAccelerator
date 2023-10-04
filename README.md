@@ -76,25 +76,18 @@ The CI/CD pipeline only works upon opening a pull request and merging branches, 
 ## Infrastructure Parameters
 In order to change the parameters of the underlying infrastructure please go into the '[variables.tf](https://github.com/IndustrialTeam2/ContainerAccelerator/blob/main/variables.tf)' file and edit there.
 
-- `cluster_name` - Name of the cluster.
-
-- `region` - AWS region where the cluster will be located.
-
-- `vpc_name` - Name of the cluster VPC.
-
-- `vpc_availability_zones` - AWS availability zones for the VPC.
-
-- `vpc_private_subnets` - Private IP subnets for the VPC.
-
-- `vpc_public_subnets` - Public IP subnets for the VPC.
-
-- `node_group_instance_types` - Instance types that will be used in the default node group.
-
-- `node_group_minimum_instances` - Minimum number of instances in the default node group.
-
-- `node_group_desired_instances` - Desired number of instances in the default node group.
-
-- `node_group_maximum_instances` - Maximum number of instances in the default node group.
+|                                |                                                             |
+| ------------------------------ | ----------------------------------------------------------- |
+| `cluster_name`                 | Name of the cluster.                                        |
+| `region`                       | AWS region where the cluster will be located.               |
+| `vpc_name`                     | Name of the cluster VPC.                                    |
+| `vpc_availability_zones`       | AWS availability zones for the VPC.                         |
+| `vpc_private_subnets`          | Private IP subnets for the VPC.                             |
+| `vpc_public_subnets`           | Public IP subnets for the VPC.                              |
+| `node_group_instance_types`    | Instance types that will be used in the default node group. |
+| `node_group_minimum_instances` | Minimum number of instances in the default node group.      |
+| `node_group_desired_instances` | Desired number of instances in the default node group.      |
+| `node_group_maximum_instances` | Maximum number of instances in the default node group.      |
 
 -----------------------------------------------------------------------------
 ## Sources
