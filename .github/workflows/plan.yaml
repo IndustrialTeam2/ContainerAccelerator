@@ -70,10 +70,10 @@ jobs:
           show-drift: true
 
     # Post the generated diagram as a GitHub comment
-      - name: Comment PR
+      - name: Add diagram as comment
         uses: thollander/actions-comment-pull-request@v2
         with:
-          filePath: diagram-comment.md
+          filePath: comment.md
 
       - name: Import Terraform state
         #if: steps.dnld_state.outcome == 'success'
