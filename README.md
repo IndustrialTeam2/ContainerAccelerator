@@ -130,3 +130,18 @@ In order to change the parameters of the underlying infrastructure please go int
  > https://github.com/thollander/actions-comment-pull-request/tree/v2/
  >
  > Date Accessed - [01/10/2023]
+
+ > #### Pluralith - Initialisation:
+ > https://github.com/Pluralith/actions/tree/v1.4.0/init
+ >
+ > Date Accessed - [04/10/2023]
+
+ > #### Pluralith - Run:  
+ > https://github.com/Pluralith/actions/tree/v1.4.0/run
+ >
+ > Date Accessed - [04/10/2023]
+
+ > #### Run Python:  
+ > https://github.com/actions/setup-python/tree/v3/
+ >
+ > Date Accessed - [04/10/2023]
