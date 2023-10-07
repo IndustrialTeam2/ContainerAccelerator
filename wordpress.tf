@@ -1,5 +1,5 @@
+/*
 resource "kubernetes_deployment" "wordpress" {
-  depends_on = [aws_db_instance.rds]
 
 
   metadata {
@@ -11,7 +11,7 @@ resource "kubernetes_deployment" "wordpress" {
   }
 
   spec {
-    replicas = 1
+    replicas = 3
     selector {
       match_labels = {
         app = "wordpress"
@@ -30,19 +30,19 @@ resource "kubernetes_deployment" "wordpress" {
           name  = "wordpress"
           env {
             name  = "WORDPRESS_DB_HOST"
-            value = aws_db_instance.rds.endpoint
+            value = "test"
           }
           env {
             name  = "WORDPRESS_DB_USER"
-            value = aws_db_instance.rds.username
+            value = "test"
           }
           env {
             name  = "WORDPRESS_DB_PASSWORD"
-            value = aws_db_instance.rds.password
+            value = "test"
           }
           env {
             name  = "WORDPRESS_DB_DATABASE"
-            value = aws_db_instance.rds.db_name
+            value = "test"
           }
           env {
             name  = "WP_DEBUG"
@@ -54,9 +54,6 @@ resource "kubernetes_deployment" "wordpress" {
           }
           port {
             container_port = 80
-          }
-          port {
-            container_port = 9090
           }
         }
       }
@@ -71,7 +68,7 @@ resource "kubernetes_service" "wordpress" {
   }
   spec {
     selector = {
-      app = kubernetes_deployment.wordpress.spec.0.template.0.metadata[0].labels.app
+      app = "wordpress"
     }
     port {
       port        = 80
@@ -84,7 +81,7 @@ resource "kubernetes_service" "wordpress" {
   }
 }
 
-resource "kubernetes_ingress_v1" "wordpress" {
+resource "kubernetes_ingress_v1" "wordpress"{
   metadata {
     name = "wordpress"
     labels = {
@@ -118,3 +115,5 @@ resource "kubernetes_ingress_v1" "wordpress" {
     }
   }
 }
+
+*/

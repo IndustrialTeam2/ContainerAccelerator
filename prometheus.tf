@@ -1,13 +1,15 @@
 
 resource "kubernetes_namespace" "prometheus" {
+  count = var.enable_monitoring ? 1 : 0
   metadata {
-    name = "monitoring"
+    name = var.monitoring_namespace
   }
 }
 
 # role for prometheus service account
 # used for prometheus to discover kubernetes cluster
 resource "kubernetes_cluster_role" "prometheus" {
+  count = var.enable_monitoring ? 1 : 0
   metadata {
     name = "prometheus-cluster-role"
   }
@@ -45,6 +47,7 @@ resource "kubernetes_cluster_role" "prometheus" {
 
 # this binds the prometheus service account to the prometheus cluster role
 resource "kubernetes_cluster_role_binding" "prometheus_discoverer" {
+  count = var.enable_monitoring ? 1 : 0
   depends_on = [ 
     kubernetes_cluster_role.prometheus,
     kubernetes_service_account.prometheus,
@@ -57,24 +60,25 @@ resource "kubernetes_cluster_role_binding" "prometheus_discoverer" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind     = "ClusterRole"
-    name     = kubernetes_cluster_role.prometheus.metadata[0].name
+    name     = kubernetes_cluster_role.prometheus[0].metadata[0].name
   }
 
   subject {
     kind = "ServiceAccount"
-    name = kubernetes_service_account.prometheus.metadata[0].name
-    namespace = kubernetes_namespace.prometheus.metadata[0].name
+    name = kubernetes_service_account.prometheus[0].metadata[0].name
+    namespace = kubernetes_namespace.prometheus[0].metadata[0].name
   }
 }
 # reads the prometheus.yaml file and store it in the config map
 # config maps are used to store configuration files in kubernetes for pods to use
 resource "kubernetes_config_map" "prometheus-config"{
+  count = var.enable_monitoring ? 1 : 0
   depends_on = [ 
     kubernetes_namespace.prometheus
    ]
     metadata {
         name = "prometheus-config"
-        namespace = kubernetes_namespace.prometheus.metadata[0].name
+        namespace = kubernetes_namespace.prometheus[0].metadata[0].name
     }
 
     # reads local config file
@@ -84,18 +88,20 @@ resource "kubernetes_config_map" "prometheus-config"{
 }
 
 resource "kubernetes_service_account" "prometheus" {
+    count = var.enable_monitoring ? 1 : 0
   depends_on = [ 
     kubernetes_namespace.prometheus
    ]
   metadata {
     name = "prometheus"
-    namespace = kubernetes_namespace.prometheus.metadata[0].name
+    namespace = kubernetes_namespace.prometheus[0].metadata[0].name
   }
 }
 
 
 # deploys prometheus pod
 resource "kubernetes_deployment" "prometheus" {
+    count = var.enable_monitoring ? 1 : 0
   depends_on = [ 
     kubernetes_namespace.prometheus,
     kubernetes_service_account.prometheus,
@@ -108,7 +114,7 @@ resource "kubernetes_deployment" "prometheus" {
     labels = {
       app = "prometheus"
     }
-    namespace = kubernetes_namespace.prometheus.metadata[0].name
+    namespace = kubernetes_namespace.prometheus[0].metadata[0].name
   }
 
   spec {
@@ -126,7 +132,7 @@ resource "kubernetes_deployment" "prometheus" {
       }
 
       spec {
-        service_account_name = kubernetes_service_account.prometheus.metadata[0].name
+        service_account_name = kubernetes_service_account.prometheus[0].metadata[0].name
         automount_service_account_token = true
         container {
           name = "prometheus"
@@ -151,7 +157,7 @@ resource "kubernetes_deployment" "prometheus" {
         volume {
           name = "config"
           config_map {
-            name = kubernetes_config_map.prometheus-config.metadata[0].name
+            name = kubernetes_config_map.prometheus-config[0].metadata[0].name
           }
         }
 
@@ -166,14 +172,15 @@ resource "kubernetes_deployment" "prometheus" {
 
 
 resource "kubernetes_service" "prometheus" {
+    count = var.enable_monitoring ? 1 : 0
     metadata {
         name = "prometheus-lb"
-        namespace = "monitoring"
+        namespace = kubernetes_namespace.prometheus[0].metadata[0].name
     }
     
     spec {
         selector = {
-        app = kubernetes_deployment.prometheus.spec[0].template[0].metadata[0].labels.app
+        app = "prometheus"
         }
     
         port {
@@ -187,12 +194,13 @@ resource "kubernetes_service" "prometheus" {
 
 
 resource "kubernetes_ingress_v1" "prometheus" {
+    count = var.enable_monitoring ? 1 : 0
   metadata {
     name = "prometheus"
     labels = {
       app = "prometheus"
     }
-    namespace = kubernetes_namespace.prometheus.metadata[0].name
+    namespace = kubernetes_namespace.prometheus[0].metadata[0].name 
 
     annotations = {
       "alb.ingress.kubernetes.io/scheme" = "internet-facing"
@@ -211,9 +219,9 @@ resource "kubernetes_ingress_v1" "prometheus" {
           path = "/*"
           backend {
             service {
-              name = kubernetes_service.prometheus.metadata[0].name
+              name = kubernetes_service.prometheus[0].metadata[0].name
               port {
-                number = kubernetes_service.prometheus.spec[0].port[0].port
+                number = kubernetes_service.prometheus[0].spec[0].port[0].port
               }
             }
           }
@@ -227,12 +235,13 @@ resource "kubernetes_ingress_v1" "prometheus" {
 
 # Create a Kubernetes DaemonSet for the node exporter
 resource "kubernetes_daemonset" "node_exporter" {
+    count = var.enable_monitoring && var.enable_node_monitoring ? 1 : 0
   metadata {
     name = "node-exporter"
     labels = {
       app = "node-exporter"
     }
-    namespace = "monitoring"
+    namespace = kubernetes_namespace.prometheus[0].metadata[0].name
   }
 
   spec {
@@ -298,9 +307,10 @@ resource "kubernetes_daemonset" "node_exporter" {
 
 # Expose the node exporter metrics endpoint using a Kubernetes service
 resource "kubernetes_service" "node_exporter" {
+    count = var.enable_monitoring && var.enable_node_monitoring ? 1 : 0
   metadata {
     name = "node-exporter"
-    namespace = "monitoring"
+    namespace = kubernetes_namespace.prometheus[0].metadata[0].name
     annotations = {
       
     }
@@ -326,17 +336,19 @@ resource "kubernetes_service" "node_exporter" {
 # Can't be tested in AWS Lab
 
 resource "kubernetes_service_account" "kube_state_metrics" {
+    count = var.enable_monitoring && var.enable_kube_state_metrics ? 1 : 0
   depends_on = [ 
     kubernetes_namespace.prometheus
    ]
 
   metadata {
     name = "kube-state-metrics"
-    namespace = "monitoring"
+    namespace = kubernetes_namespace.prometheus[0].metadata[0].name
   }
 }
 
 resource "kubernetes_cluster_role" "kube_state_metrics" {
+    count = var.enable_monitoring && var.enable_kube_state_metrics ? 1 : 0
   metadata {
     name = "kube-state-metrics"
     labels = {
@@ -455,6 +467,7 @@ resource "kubernetes_cluster_role" "kube_state_metrics" {
 }
 
 resource "kubernetes_cluster_role_binding" "kube_state_metrics" {
+    count = var.enable_monitoring && var.enable_kube_state_metrics ? 1 : 0
     metadata {
     name = "kube-state-metrics"
   }
@@ -462,21 +475,22 @@ resource "kubernetes_cluster_role_binding" "kube_state_metrics" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind     = "ClusterRole"
-    name     = kubernetes_cluster_role.kube_state_metrics.metadata[0].name
+    name     = kubernetes_cluster_role.kube_state_metrics[0].metadata[0].name
   }
 
   subject {
     kind = "ServiceAccount"
-    name = kubernetes_service_account.kube_state_metrics.metadata[0].name
-    namespace = kubernetes_namespace.prometheus.metadata[0].name
+    name = kubernetes_service_account.kube_state_metrics[0].metadata[0].name
+    namespace = kubernetes_namespace.prometheus[0].metadata[0].name
   }
 }
 
 
 resource "kubernetes_deployment" "kube_state_metrics" {
+    count = var.enable_monitoring && var.enable_kube_state_metrics ? 1 : 0
   metadata {
     name = "kube-state-metrics"
-    namespace = "monitoring"
+    namespace = kubernetes_namespace.prometheus[0].metadata[0].name
     labels = {
       "app.kubernetes.io/component" = "exporter",
       "app.kubernetes.io/name" = "kube-state-metrics",
@@ -501,21 +515,9 @@ resource "kubernetes_deployment" "kube_state_metrics" {
         }
       }
       spec {
-        node_selector = {
-          "kubernetes.io/os" = "linux"
-
-        }
-        service_account_name = kubernetes_service_account.kube_state_metrics.metadata[0].name
+        service_account_name = kubernetes_service_account.kube_state_metrics[0].metadata[0].name
         container {
           image = "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.10.0"
-          liveness_probe {
-            http_get {
-              path = "/healthz"
-              port = 8080
-            }
-            initial_delay_seconds = 5
-            timeout_seconds = 5
-          }
           name = "kube-state-metrics"
           port {
             container_port = 8080
@@ -526,25 +528,6 @@ resource "kubernetes_deployment" "kube_state_metrics" {
             container_port = 8081
             name = "telemetry"
           }
-
-          readiness_probe {
-            http_get {
-              path = "/"
-              port = 8081
-            }
-            initial_delay_seconds = 5
-            timeout_seconds = 5
-          }
-
-          security_context {
-            allow_privilege_escalation = false
-            capabilities {
-              drop = ["all"]
-            }
-            read_only_root_filesystem = true
-            run_as_non_root = true
-            run_as_user = 65534
-          }
         }
       }
     }
@@ -552,10 +535,12 @@ resource "kubernetes_deployment" "kube_state_metrics" {
   } 
 }
 
+
 resource "kubernetes_service" "kube_state_metrics" {
+    count = var.enable_monitoring && var.enable_kube_state_metrics ? 1 : 0
     metadata {
       name = "kube-state-metrics"
-      namespace = "monitoring"
+      namespace = kubernetes_namespace.prometheus[0].metadata[0].name
       labels = {
         "app.kubernetes.io/component" = "exporter",
         "app.kubernetes.io/name" = "kube-state-metrics",
@@ -584,13 +569,15 @@ resource "kubernetes_service" "kube_state_metrics" {
 
 // Could be enhanced by using the the kublet's built in cadvisor
 resource "kubernetes_service_account" "cadvisor" {
+    count = var.enable_monitoring && var.enable_cadvisor_metrics ? 1 : 0
     metadata {
       name = "cadvisor"
-      namespace = "monitoring"
+      namespace = kubernetes_namespace.prometheus[0].metadata[0].name
     }
 }
 
 resource "kubernetes_cluster_role" "cadvisor" {
+    count = var.enable_monitoring && var.enable_cadvisor_metrics ? 1 : 0
   metadata {
     name = "cadvisor"
   }
@@ -604,6 +591,7 @@ resource "kubernetes_cluster_role" "cadvisor" {
 }
 
 resource "kubernetes_cluster_role_binding" "cadvisor" {
+  count = var.enable_monitoring && var.enable_cadvisor_metrics ? 1 : 0
   metadata {
     name = "cadvisor"
   }
@@ -611,19 +599,20 @@ resource "kubernetes_cluster_role_binding" "cadvisor" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind     = "ClusterRole"
-    name     = kubernetes_cluster_role.cadvisor.metadata[0].name
+    name     = kubernetes_cluster_role.cadvisor[0].metadata[0].name
   }
 
   subject {
     kind = "ServiceAccount"
-    name = kubernetes_service_account.cadvisor.metadata[0].name
-    namespace = kubernetes_namespace.prometheus.metadata[0].name
+    name = kubernetes_service_account.cadvisor[0].metadata[0].name
+    namespace = kubernetes_namespace.prometheus[0].metadata[0].name
   }
 }
 resource "kubernetes_daemonset" "cadvisor" {
+    count = var.enable_monitoring && var.enable_cadvisor_metrics ? 1 : 0
   metadata {
     name      = "cadvisor"
-    namespace = kubernetes_namespace.prometheus.metadata[0].name
+    namespace = kubernetes_namespace.prometheus[0].metadata[0].name
   }
 
   spec {
@@ -642,7 +631,7 @@ resource "kubernetes_daemonset" "cadvisor" {
       }
 
       spec {
-        service_account_name = kubernetes_service_account.cadvisor.metadata[0].name
+        service_account_name = kubernetes_service_account.cadvisor[0].metadata[0].name
 
         container {
           name  = "cadvisor"
@@ -735,9 +724,10 @@ resource "kubernetes_daemonset" "cadvisor" {
 
 
 resource "kubernetes_service" "cadvisor" {
+    count = var.enable_monitoring && var.enable_cadvisor_metrics ? 1 : 0
   metadata {
     name = "cadvisor"
-    namespace = kubernetes_namespace.prometheus.metadata[0].name
+    namespace = kubernetes_namespace.prometheus[0].metadata[0].name
   }
 
   spec {
@@ -752,5 +742,7 @@ resource "kubernetes_service" "cadvisor" {
     }
   }
 }
+
+
 
 
