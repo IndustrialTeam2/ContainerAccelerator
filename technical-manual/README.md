@@ -26,26 +26,26 @@
 
 Under the `permission options` section select `Attach policies directly`.
 
->![Alt text](./res/images/perm_options.png)
+>![Alt text](./images/perm_options.png)
 
 Then select `AdministratorAccess`, `IAMFullAccess` and `PowerUserAccess`, and press `Add Permissions` to confirm.
 
 4. Select the `Security credentials` tab and give this user console-access.
 
-> ![Security credenitals image.](./res/images/security_credentials.png)
+> ![Security credenitals image.](./images/security_credentials.png)
 
 5. Create an access key tied to this user. 
-> ![Showing how to create access key.](./res/images/access_keys.png)
+> ![Showing how to create access key.](./images/access_keys.png)
 
 Select the `Command Line Interface (CLI)` option.
 
-> ![Showing to select the CLI option.](./res/images/cli_option.png)
+> ![Showing to select the CLI option.](./images/cli_option.png)
 
 Give it a meaningful description tag value.
  
 Make sure to download the csv file provided as that contains the ID and key pair for the access key that has been created, these will be needed for our GitHub repository secrets.
 
-> ![Showing where to download the newly created access keys CSV file.](./res/images/access_keys_csv.png)
+> ![Showing where to download the newly created access keys CSV file.](./images/access_keys_csv.png)
 > <br></br>
 -----------------------------------------------------------------------------
 ### Encryption Key
