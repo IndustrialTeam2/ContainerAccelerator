@@ -1,3 +1,4 @@
+# This creates a developer role that can be used to deploy applications to the EKS cluster
 resource "aws_iam_role" "eks_cluster_developer" {
   name = "eks_cluster_developer"
 
@@ -13,11 +14,13 @@ resource "aws_iam_role" "eks_cluster_developer" {
   })
 }
 
-
+# create IAM policy that will be attached to the Developer Role
 resource "aws_iam_policy" "DeveloperAcccess" {
   name        = "DeveloperAcccess"
   description = "This policy allows the developer to deploy applications to the EKS cluster"
+ 
 
+ # The permissions for viewing the cluster and for kubectl access
   policy = jsonencode({
     "Version" : "2012-10-17"
     "Statement" : [
@@ -47,7 +50,7 @@ resource "aws_iam_policy" "DeveloperAcccess" {
         ],
         "Resource" : "*"
       },
-
+      # Allow the developer to view IAM roles and policies
         {
             "Sid": "ViewOwnUserInfo",
             "Effect": "Allow",
@@ -82,6 +85,7 @@ resource "aws_iam_policy" "DeveloperAcccess" {
             ],
             "Resource": "*"
         },
+        # Allow the developer to view CloudWatch logs
         {
             "Sid": "ViewLogs",
             "Effect": "Allow",
@@ -101,6 +105,7 @@ resource "aws_iam_policy" "DeveloperAcccess" {
             ],
             "Resource": "*"
         },
+        # Allow the developer to view nodes in the cluster
          {
             "Sid": "EC2Describe",
             "Effect": "Allow",
@@ -180,6 +185,8 @@ resource "aws_iam_policy" "DeveloperAcccess" {
   })
 }
 
+
+# Attach the policy to the Developer Role
 resource "aws_iam_policy_attachment" "eks_developer_policy_attachment" {
   name = "eks_developer_policy_attachment"
   policy_arn = aws_iam_policy.DeveloperAcccess.arn

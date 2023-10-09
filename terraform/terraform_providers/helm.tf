@@ -1,3 +1,10 @@
+# This adds the helm provider to the Terraform configuration
+#
+# Arguments:
+# - `kubernetes`: The Kubernetes configuration for the provider.
+#    * `host`: The endpoint for the Kubernetes API server.
+#    * `cluster_ca_certificate`: The CA certificate for the Kubernetes cluster.
+# - `exec`: Used for authenticating to the Kubernetes cluster.
 provider "helm" {
     kubernetes {
       host = module.eks.cluster_endpoint
@@ -11,6 +18,4 @@ provider "helm" {
       args = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
     }
     }
-
-    
 }
